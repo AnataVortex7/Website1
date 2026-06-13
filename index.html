@@ -2,10 +2,57 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="refresh" content="0;url=https://sick-nikaniki-shubham8208989-6d7c863a.koyeb.app/">
-  <script>window.location.href="https://sick-nikaniki-shubham8208989-6d7c863a.koyeb.app/";</script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Redirecting...</title>
+  <meta http-equiv="refresh" content="3;url=https://sick-nikaniki-shubham8208989-6d7c863a.koyeb.app/">
+  <style>
+    body {
+      background: #0a0a0a;
+      color: #fff;
+      font-family: system-ui, -apple-system, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      gap: 20px;
+    }
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid #333;
+      border-top-color: #4ade80;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .btn {
+      background: #1a1a1a;
+      color: #fff;
+      padding: 12px 24px;
+      border-radius: 10px;
+      text-decoration: none;
+      border: 1px solid rgba(255,255,255,0.1);
+      transition: all 0.2s;
+    }
+    .btn:hover { background: #252525; border-color: rgba(255,255,255,0.2); }
+    .note { color: #666; font-size: 14px; }
+  </style>
 </head>
 <body>
-  Redirecting...
+  <div class="spinner"></div>
+  <p>Redirecting to app...</p>
+  
+  <a href="watch.html" class="btn">🎓 Student Watch</a>
+  <a href="https://sick-nikaniki-shubham8208989-6d7c863a.koyeb.app/" class="btn" style="background:transparent; font-size: 13px; padding: 8px 16px;">Go to App Now →</a>
+  
+  <p class="note">Or visit <b>/watch.html</b> directly</p>
+  
+  <script>
+    setTimeout(() => {
+      window.location.href = "https://sick-nikaniki-shubham8208989-6d7c863a.koyeb.app/";
+    }, 3000);
+  </script>
 </body>
 </html>
