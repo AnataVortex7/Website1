@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Watch</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #0a0a0a;
+      color: #fff;
+      font-family: 'Inter', sans-serif;
+      overflow: hidden;
+      height: 100vh;
+      width: 100vw;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* === FULL SCREEN FLIP CLOCK === */
+    .clock-container {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      transform: scale(1.2);
+    }
+
+    .flip-unit {
+      display: flex;
+      gap: 6px;
+    }
+
+    .flip-card {
+      position: relative;
+      width: 80px;
+      height: 120px;
+      background: #1a1a1a;
+      border-radius: 8px;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 80px;
+      line-height: 120px;
+      text-align: center;
+      color: #fff;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+      overflow: hidden;
+    }
+
+    .flip-card::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: #0a0a0a;
+      z-index: 10;
+      box-shadow: 0 1px 0 rgba(255,255,255,0.05);
+    }
+
+    .flip-card .top, .flip-card .bottom {
+      position: absolute;
+      left: 0;
+      width: 100%;
+      height: 50%;
+      overflow: hidden;
+      backface-visibility: hidden;
+      background: #1a1a1a;
+    }
+
+    .flip-card .top {
+      top: 0;
+      border-radius: 8px 8px 0 0;
+      line-height: 120px;
+      transform-origin: bottom;
+    }
+
+    .flip-card .bottom {
+      bottom: 0;
+      border-radius: 0 0 8px 8px;
+      line-height: 0;
+      transform-origin: top;
+      transform: rotateX(90deg);
+      opacity: 0;
+    }
+
+    .flip-card .top-flip {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 50%;
+      overflow: hidden;
+      border-radius: 8px 8px 0 0;
+      line-height: 120px;
+      background: #1a1a1a;
+      transform-origin: bottom;
+      z-index: 5;
+    }
+
+    .flip-card .bottom-flip {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 50%;
+      overflow: hidden;
+      border-radius: 0 0 8px 8px;
+      line-height: 0;
+      background: #1a1a1a;
+      transform-origin: top;
+      z-index: 5;
+      transform: rotateX(90deg);
+    }
+
+    .flip-card.flip .top-flip {
+      animation: flipTop 0.6s ease-in forwards;
+    }
+
+    .flip-card.flip .bottom-flip {
+      animation: flipBottom 0.6s ease-out 0.6s forwards;
+    }
+
+    @keyframes flipTop {
+      0% { transform: rotateX(0deg); }
+      100% { transform: rotateX(-90deg); opacity: 0.5; }
+    }
+
+    @keyframes flipBottom {
+      0% { transform: rotateX(90deg); opacity: 0.5; }
+      100% { transform: rotateX(0deg); opacity: 1; }
+    }
+
+    .separator {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 80px;
+      line-height: 120px;
+      color: #fff;
+      padding: 0 4px;
+    }
+
+    .clock-label {
+      text-align: center;
+      margin-top: 30px;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: #666;
+    }
+
+    /* === FLOATING TIMER (TOP RIGHT) === */
+    .timer-float {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: rgba(26, 26, 26, 0.95);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 14px 18px;
+      z-index: 1000;
+      min-width: 180px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+      transition: transform 0.3s ease;
+    }
+
+    .timer-float:hover {
+      transform: translateY(-2px);
+    }
+
+    .timer-float .timer-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .timer-float .timer-title {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: #888;
+      font-weight: 600;
+    }
+
+    .timer-float .timer-dots {
+      display: flex;
+      gap: 4px;
+    }
+
+    .timer-float .timer-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #333;
+    }
+
+    .timer-float .timer-dot.active {
+      background: #4ade80;
+      box-shadow: 0 0 6px #4ade80;
+    }
+
+    .timer-float .timer-display {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 36px;
+      line-height: 1;
+      color: #fff;
+      text-align: center;
+      letter-spacing: 2px;
+      margin-bottom: 10px;
+    }
+
+    .timer-float .timer-controls {
+      display: flex;
+      gap: 6px;
+      justify-content: center;
+    }
+
+    .timer-float .timer-btn {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: #fff;
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      transition: all 0.2s;
+      padding: 0;
+    }
+
+    .timer-float .timer-btn:hover {
+      background: rgba(255,255,255,0.15);
+      border-color: rgba(255,255,255,0.25);
+    }
+
+    .timer-float .timer-btn.play { color: #4ade80; }
+    .timer-float .timer-btn.pause { color: #fbbf24; }
+    .timer-float .timer-btn.reset { color: #f87171; }
+
+    /* Date below main clock */
+    .date-display {
+      margin-top: 12px;
+      font-size: 16px;
+      color: #555;
+      letter-spacing: 3px;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .clock-container { transform: scale(0.8); }
+      .timer-float { transform: scale(0.85); right: 8px; top: 8px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Main Flip Clock -->
+  <div class="clock-container" id="mainClock">
+    <div class="flip-unit" id="hours">
+      <div class="flip-card" data-val="0"><span class="top">0</span><span class="bottom">0</span><span class="top-flip">0</span><span class="bottom-flip">0</span></div>
+      <div class="flip-card" data-val="0"><span class="top">0</span><span class="bottom">0</span><span class="top-flip">0</span><span class="bottom-flip">0</span></div>
+    </div>
+    <div class="separator">:</div>
+    <div class="flip-unit" id="minutes">
+      <div class="flip-card" data-val="0"><span class="top">0</span><span class="bottom">0</span><span class="top-flip">0</span><span class="bottom-flip">0</span></div>
+      <div class="flip-card" data-val="0"><span class="top">0</span><span class="bottom">0</span><span class="top-flip">0</span><span class="bottom-flip">0</span></div>
+    </div>
+    <div class="separator">:</div>
+    <div class="flip-unit" id="seconds">
+      <div class="flip-card" data-val="0"><span class="top">0</span><span class="bottom">0</span><span class="top-flip">0</span><span class="bottom-flip">0</span></div>
+      <div class="flip-card" data-val="0"><span class="top">0</span><span class="bottom">0</span><span class="top-flip">0</span><span class="bottom-flip">0</span></div>
+    </div>
+  </div>
+
+  <div class="clock-label">Current Time</div>
+  <div class="date-display" id="dateDisplay"></div>
+
+  <!-- Floating Corner Timer -->
+  <div class="timer-float">
+    <div class="timer-header">
+      <span class="timer-title">Study Timer</span>
+      <div class="timer-dots">
+        <div class="timer-dot" id="dot1"></div>
+        <div class="timer-dot" id="dot2"></div>
+      </div>
+    </div>
+    <div class="timer-display" id="timerDisplay">00:00:00</div>
+    <div class="timer-controls">
+      <button class="timer-btn play" onclick="startTimer()" title="Start">▶</button>
+      <button class="timer-btn pause" onclick="pauseTimer()" title="Pause">⏸</button>
+      <button class="timer-btn reset" onclick="resetTimer()" title="Reset">↺</button>
+    </div>
+  </div>
+
+  <script>
+    // === MAIN FLIP CLOCK ===
+    function updateClock() {
+      const now = new Date();
+      const h = String(now.getHours()).padStart(2, '0');
+      const m = String(now.getMinutes()).padStart(2, '0');
+      const s = String(now.getSeconds()).padStart(2, '0');
+
+      updateUnit('hours', h);
+      updateUnit('minutes', m);
+      updateUnit('seconds', s);
+
+      // Date
+      const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+      document.getElementById('dateDisplay').textContent = now.toLocaleDateString('en-IN', options);
+    }
+
+    function updateUnit(id, val) {
+      const unit = document.getElementById(id);
+      const cards = unit.querySelectorAll('.flip-card');
+      updateDigit(cards[0], val[0]);
+      updateDigit(cards[1], val[1]);
+    }
+
+    function updateDigit(card, newVal) {
+      const oldVal = card.getAttribute('data-val');
+      if (oldVal === newVal) return;
+
+      const top = card.querySelector('.top');
+      const bottom = card.querySelector('.bottom');
+      const topFlip = card.querySelector('.top-flip');
+      const bottomFlip = card.querySelector('.bottom-flip');
+
+      topFlip.textContent = oldVal;
+      bottomFlip.textContent = newVal;
+      top.textContent = newVal;
+      bottom.textContent = newVal;
+
+      card.classList.remove('flip');
+      void card.offsetWidth;
+      card.classList.add('flip');
+
+      card.setAttribute('data-val', newVal);
+
+      setTimeout(() => {
+        card.classList.remove('flip');
+      }, 1200);
+    }
+
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // === FLOATING STUDY TIMER ===
+    let timerInterval = null;
+    let timerSeconds = 0;
+    let timerRunning = false;
+
+    const timerDisplay = document.getElementById('timerDisplay');
+    const dot1 = document.getElementById('dot1');
+    const dot2 = document.getElementById('dot2');
+
+    function formatTime(sec) {
+      const h = String(Math.floor(sec / 3600)).padStart(2, '0');
+      const m = String(Math.floor((sec % 3600) / 60)).padStart(2, '0');
+      const s = String(sec % 60).padStart(2, '0');
+      return `${h}:${m}:${s}`;
+    }
+
+    function updateTimer() {
+      timerDisplay.textContent = formatTime(timerSeconds);
+      if (timerRunning) {
+        dot1.classList.toggle('active');
+        dot2.classList.toggle('active');
+      }
+    }
+
+    function startTimer() {
+      if (timerRunning) return;
+      timerRunning = true;
+      dot1.classList.add('active');
+      dot2.classList.add('active');
+      timerInterval = setInterval(() => {
+        timerSeconds++;
+        updateTimer();
+      }, 1000);
+    }
+
+    function pauseTimer() {
+      timerRunning = false;
+      clearInterval(timerInterval);
+      dot1.classList.remove('active');
+      dot2.classList.remove('active');
+    }
+
+    function resetTimer() {
+      pauseTimer();
+      timerSeconds = 0;
+      updateTimer();
+    }
+
+    updateTimer();
+  </script>
+
+</body>
+</html>
