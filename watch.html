@@ -191,15 +191,15 @@
     /* === FLOATING STUDY TIMER (TOP RIGHT) === */
     .timer-float {
       position: fixed;
-      top: 20px;
-      right: 20px;
+      top: 24px;
+      right: 24px;
       background: rgba(21, 21, 21, 0.95);
       backdrop-filter: blur(10px);
       border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 12px;
-      padding: 14px 18px;
+      border-radius: 16px;
+      padding: 22px 28px;
       z-index: 1000;
-      min-width: 180px;
+      min-width: 280px;
       box-shadow: 0 8px 32px rgba(0,0,0,0.4);
     }
 
@@ -207,11 +207,11 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 8px;
+      margin-bottom: 14px;
     }
 
     .timer-title {
-      font-size: 10px;
+      font-size: 14px;
       text-transform: uppercase;
       letter-spacing: 2px;
       color: #888;
@@ -220,12 +220,12 @@
 
     .timer-dots {
       display: flex;
-      gap: 4px;
+      gap: 6px;
     }
 
     .timer-dot {
-      width: 6px;
-      height: 6px;
+      width: 9px;
+      height: 9px;
       border-radius: 50%;
       background: #333;
       transition: background 0.3s;
@@ -233,22 +233,22 @@
 
     .timer-dot.active {
       background: #4ade80;
-      box-shadow: 0 0 6px #4ade80;
+      box-shadow: 0 0 8px #4ade80;
     }
 
     .timer-display {
       font-family: 'Bebas Neue', sans-serif;
-      font-size: 36px;
+      font-size: 64px;
       line-height: 1;
       color: #fff;
       text-align: center;
-      letter-spacing: 2px;
-      margin-bottom: 10px;
+      letter-spacing: 3px;
+      margin-bottom: 18px;
     }
 
     .timer-controls {
       display: flex;
-      gap: 6px;
+      gap: 10px;
       justify-content: center;
     }
 
@@ -256,14 +256,14 @@
       background: rgba(255,255,255,0.08);
       border: 1px solid rgba(255,255,255,0.1);
       color: #fff;
-      width: 32px;
-      height: 32px;
-      border-radius: 8px;
+      width: 48px;
+      height: 48px;
+      border-radius: 10px;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 13px;
+      font-size: 20px;
       transition: all 0.2s;
       padding: 0;
     }
@@ -312,7 +312,7 @@
     }
 
     @media (max-width: 768px) {
-      .timer-float { transform: scale(0.85); right: 8px; top: 8px; }
+      .timer-float { transform: scale(0.7); transform-origin: top right; right: 8px; top: 8px; }
       .clock-wrapper { gap: 8px; }
       .fs-hint { display: none; }
     }
@@ -426,25 +426,39 @@
       const bottom = card.querySelector('.bottom span');
       const topFlip = card.querySelector('.top-flip span');
       const bottomFlip = card.querySelector('.bottom-flip span');
+      const topFlipEl = card.querySelector('.top-flip');
+      const bottomFlipEl = card.querySelector('.bottom-flip');
 
-      // Phase 1 (0 - 0.6s): top-flip shows OLD value flipping down, bottom-flip stays OLD (hidden, rotated)
+      // Static layers already show the new value underneath
       topFlip.textContent = oldVal;
       bottomFlip.textContent = oldVal;
-      top.textContent = newVal;   // static top already shows new value underneath
+      top.textContent = newVal;
       bottom.textContent = newVal;
 
+      // Swap bottomFlip's text exactly when its own animation begins (synced to compositor, no drift)
+      function onTopFlipStart(e) {
+        if (e.animationName === 'flipTop') {
+          // top flap fully down now -> safe to arm bottom flap text just before it starts
+        }
+      }
+      function onBottomFlipStart(e) {
+        if (e.animationName === 'flipBottom') {
+          bottomFlip.textContent = newVal;
+          bottomFlipEl.removeEventListener('animationstart', onBottomFlipStart);
+        }
+      }
+      function onBottomFlipEnd(e) {
+        if (e.animationName === 'flipBottom') {
+          topFlip.textContent = newVal;
+          card.classList.remove('flip');
+          bottomFlipEl.removeEventListener('animationend', onBottomFlipEnd);
+        }
+      }
+
+      bottomFlipEl.addEventListener('animationstart', onBottomFlipStart);
+      bottomFlipEl.addEventListener('animationend', onBottomFlipEnd);
+
       card.classList.add('flip');
-
-      // Phase 2 (starts at 0.6s): bottom-flip switches to NEW value just as it starts rotating into view
-      setTimeout(() => {
-        bottomFlip.textContent = newVal;
-      }, 600);
-
-      setTimeout(() => {
-        topFlip.textContent = newVal;
-        card.classList.remove('flip');
-      }, 1200);
-
       card.setAttribute('data-val', newVal);
     }
 
