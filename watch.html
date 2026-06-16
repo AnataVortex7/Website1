@@ -427,17 +427,21 @@
       const topFlip = card.querySelector('.top-flip span');
       const bottomFlip = card.querySelector('.bottom-flip span');
 
+      // Phase 1 (0 - 0.6s): top-flip shows OLD value flipping down, bottom-flip stays OLD (hidden, rotated)
       topFlip.textContent = oldVal;
-      bottomFlip.textContent = newVal;
-      top.textContent = newVal;
+      bottomFlip.textContent = oldVal;
+      top.textContent = newVal;   // static top already shows new value underneath
       bottom.textContent = newVal;
 
       card.classList.add('flip');
 
+      // Phase 2 (starts at 0.6s): bottom-flip switches to NEW value just as it starts rotating into view
       setTimeout(() => {
-        // Reset flip layers to match static layers before removing animation
-        topFlip.textContent = newVal;
         bottomFlip.textContent = newVal;
+      }, 600);
+
+      setTimeout(() => {
+        topFlip.textContent = newVal;
         card.classList.remove('flip');
       }, 1200);
 
