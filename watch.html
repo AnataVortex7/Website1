@@ -8,9 +8,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <style>
     :root {
-      --card-w: 85px;
-      --card-h: 130px;
-      --font-s: 85px;
+      --card-w: 140px;
+      --card-h: 210px;
+      --font-s: 140px;
       --bg: #0a0a0a;
       --card-bg: #151515;
       --accent: #fff;
@@ -18,13 +18,18 @@
 
     @media (max-width: 768px) {
       :root {
-        --card-w: 55px;
-        --card-h: 85px;
-        --font-s: 55px;
+        --card-w: 70px;
+        --card-h: 105px;
+        --font-s: 70px;
       }
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+    }
 
     body {
       background: var(--bg);
@@ -43,13 +48,13 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 12px;
+      gap: 18px;
       flex-wrap: nowrap;
     }
 
     .flip-unit {
       display: flex;
-      gap: 6px;
+      gap: 8px;
     }
 
     .flip-card {
@@ -57,7 +62,7 @@
       width: var(--card-w);
       height: var(--card-h);
       background: var(--card-bg);
-      border-radius: 8px;
+      border-radius: 10px;
       font-family: 'Bebas Neue', sans-serif;
       font-size: var(--font-s);
       line-height: var(--card-h);
@@ -93,28 +98,28 @@
 
     .top, .top-flip {
       top: 0;
-      border-radius: 8px 8px 0 0;
+      border-radius: 10px 10px 0 0;
     }
 
     .bottom, .bottom-flip {
       bottom: 0;
-      border-radius: 0 0 8px 8px;
+      border-radius: 0 0 10px 10px;
     }
 
-    /* Text positioning */
+    /* Text positioning - centers the full digit inside the half-height box */
     .top span, .bottom span, .top-flip span, .bottom-flip span {
       position: absolute;
       left: 0;
-      width: 100%;
-      display: block;
-    }
-
-    .top span, .top-flip span {
       top: 0;
+      width: 100%;
+      height: var(--card-h);
+      line-height: var(--card-h);
+      display: block;
+      text-align: center;
     }
 
     .bottom span, .bottom-flip span {
-      top: calc(var(--card-h) / -2);
+      top: calc(var(--card-h) * -0.5);
     }
 
     /* Flip layers */
@@ -156,7 +161,7 @@
       font-size: var(--font-s);
       line-height: var(--card-h);
       color: var(--accent);
-      padding: 0 4px;
+      padding: 0 6px;
       animation: blink 1s infinite;
       user-select: none;
     }
@@ -167,8 +172,8 @@
     }
 
     .clock-label {
-      margin-top: 24px;
-      font-size: 13px;
+      margin-top: 28px;
+      font-size: 14px;
       letter-spacing: 4px;
       text-transform: uppercase;
       color: #555;
@@ -176,8 +181,8 @@
     }
 
     .date-display {
-      margin-top: 8px;
-      font-size: 15px;
+      margin-top: 10px;
+      font-size: 16px;
       color: #444;
       letter-spacing: 2px;
       text-align: center;
@@ -271,9 +276,45 @@
     .timer-btn.pause { color: #fbbf24; }
     .timer-btn.reset { color: #f87171; }
 
+    /* === FULLSCREEN BUTTON === */
+    .fullscreen-btn {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: rgba(21, 21, 21, 0.95);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: #fff;
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      z-index: 1000;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+      transition: background 0.2s;
+    }
+
+    .fullscreen-btn:hover {
+      background: rgba(255,255,255,0.12);
+    }
+
+    .fs-hint {
+      position: fixed;
+      bottom: 22px;
+      right: 75px;
+      color: #555;
+      font-size: 11px;
+      letter-spacing: 1px;
+      z-index: 1000;
+    }
+
     @media (max-width: 768px) {
       .timer-float { transform: scale(0.85); right: 8px; top: 8px; }
-      .clock-wrapper { gap: 6px; }
+      .clock-wrapper { gap: 8px; }
+      .fs-hint { display: none; }
     }
   </style>
 </head>
@@ -349,6 +390,10 @@
       <button class="timer-btn reset" onclick="resetTimer()" title="Reset">↺</button>
     </div>
   </div>
+
+  <!-- Fullscreen toggle -->
+  <span class="fs-hint">Esc to exit fullscreen</span>
+  <button class="fullscreen-btn" id="fsBtn" onclick="toggleFullscreen()" title="Toggle Fullscreen">⛶</button>
 
   <script>
     // === MAIN FLIP CLOCK ===
@@ -451,6 +496,20 @@
     }
 
     timerDisplay.textContent = formatTime(0);
+
+    // === FULLSCREEN TOGGLE ===
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen();
+      } else {
+        if (document.exitFullscreen) document.exitFullscreen();
+      }
+    }
+
+    document.addEventListener('fullscreenchange', () => {
+      const btn = document.getElementById('fsBtn');
+      btn.textContent = document.fullscreenElement ? '⤓' : '⛶';
+    });
   </script>
 
 </body>
